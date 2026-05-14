@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacts - Егор Горохов</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        /* Интерактивные стили для валидации */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+        .error-text {
+            color: #dc3545;
+            font-size: 12px;
+            min-height: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .invalid-input {
+            border: 2px solid #dc3545 !important;
+            background-color: #fff8f8;
+            outline: none;
+        }
+        .valid-input {
+            border: 2px solid #28a745 !important;
+            outline: none;
+        }
+        /* Эффект загрузки на кнопке */
+        .btn-submit {
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+        .btn-submit:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <header class="container">
+        <span class="logo">contacts</span>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">About me</a></li>
+                <li><a href="{{ url_for('portfolio') }}">Portfolio</a></li>
+                <li class="btn active"><a href="{{ url_for('contacts') }}">Contacts</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container contact-section">
+        <div class="contact-info">
+            <h1>Связаться со мной</h1>
+
+            <div class="social-links">
+                <p><strong>Email:</strong> <a href="mailto:egorgorohov@gmail.com">egorgorohov@gmail.com</a></p>
+            </div>
+
+            <!-- Добавлен ID формы и атрибут novalidate для отключения дефолтных подсказок браузера -->
+            <form id="contactForm" action="{{ url_for('contacts') }}" method="POST" novalidate style="margin-top: 20px; display: flex; flex-direction: column; max-width: 400px; gap: 10px;">
+                <h2>Написать мне</h2>
+
+                <div class="form-group">
+                    <label for="name">Ваше имя:</label>
+                    <input type="text" id="name" name="username" style="padding: 8px;">
+                    <span id="nameError" class="error-text"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Ваш Email:</label>
+                    <input type="email" id="email" name="user_email" style="padding: 8px;">
+                    <span id="emailError" class="error-text"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Сообщение:</label>
+                    <textarea id="message" name="user_message" rows="4" style="padding: 8px;"></textarea>
+                    <span id="messageError" class="error-text"></span>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn-submit">Отправить</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Блок JavaScript для комплексной фронтенд-логики -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('contactForm');
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const messageInput = document.getElementById('message');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Регулярное выражение для строгой проверки синтаксиса Email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            // Функция валидации отдельного поля
+            function validateField(input, condition, errorElement, errorMessage) {
+                if (condition) {
+                    errorElement.textContent = '';
+                    input.classList.remove('invalid-input');
+                    input.classList.add('valid-input');
+                    return true;
+                } else {
+                    errorElement.textContent = errorMessage;
+                    input.classList.remove('valid-input');
+                    input.classList.add('invalid-input');
+                    return false;
+                }
+            }
+
+            // Функции-обертки под каждое поле
+            function checkName() {
+                const value = nameInput.value.trim();
+                return validateField(
+                    nameInput,
+                    value.length >= 2,
+                    document.getElementById('nameError'),
+                    'Имя должно содержать не менее 2 символов'
+                );
+            }
+
+            function checkEmail() {
+                const value = emailInput.value.trim();
+                return validateField(
+                    emailInput,
+                    emailRegex.test(value),
+                    document.getElementById('emailError'),
+                    'Введите корректный адрес Email (например, user@mail.com)'
+                );
+            }
+
+            function checkMessage() {
+                const value = messageInput.value.trim();
+                return validateField(
+                    messageInput,
+                    value.length >= 10,
+                    document.getElementById('messageError'),
+                    'Сообщение должно быть информативным (от 10 символов)'
+                );
+            }
+
+            // Навешиваем «живые» события ввода данных (Валидация в реальном времени)
+            nameInput.addEventListener('input', checkName);
+            emailInput.addEventListener('input', checkEmail);
+            messageInput.addEventListener('input', checkMessage);
+
+            // Обработка финальной отправки формы
+            form.addEventListener('submit', function(event) {
+                // Запускаем проверку всех полей одновременно
+                const isNameValid = checkName();
+                const isEmailValid = checkEmail();
+                const isMessageValid = checkMessage();
+
+                // Если хотя бы одно поле не прошло валидацию — блокируем отправку на Flask
+                if (!isNameValid || !isEmailValid || !isMessageValid) {
+                    event.preventDefault();
+
+                    // Интерактивный эффект: тряска кнопки при ошибке
+                    submitBtn.style.transform = 'translateX(10px)';
+                    setTimeout(() => submitBtn.style.transform = 'translateX(-10px)', 100);
+                    setTimeout(() => submitBtn.style.transform = 'translateX(0)', 200);
+                    return;
+                }
+
+                // Визуальный фидбек: изменение состояния кнопки при успешном старте отправки
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Отправка данных...';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website about me</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+
+</head>
+<body>
+        <header class="container">
+        <span class="logo">IT-специалист</span>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">About me</a></li>
+                <li><a href="{{ url_for('portfolio') }}">Portfolio</a></li>
+                <li class="btn active"><a href="{{ url_for('contacts') }}">Contacts</a></li>
+            </ul>
+        </nav>
+    </header>
+
+
+    <div class="hero container">
+        <div class = "hero--info">
+            <h2>Егор Горохов</h2>
+            <h1>Разработчик frontend и backend</h1>
+            <p>Разрабатываю веб-приложения и сайты, работаю с frontend- и backend-частью проекта</p>
+        </div>
+        <img src="{{ url_for('static', filename='images/photo.jpg') }}" alt="Мое фото">
+
+        <div class="bio">
+            <h1>
+                Привет! Меня зовут  Егор. Я — Fullstack-разработчик. Создаю логику приложений и удобные интерфейсы. Обучение и стек технологий Backend-стек: Языки: Python, JavaScript (Node.js). Фреймворки: FastAPI, Express. Базы данных: PostgreSQL, MongoDB, Redis. Frontend-стек: Фреймворки: React, Next.js.Верстка: HTML5, CSS3, Tailwind CSS.Состояние: Redux Toolkit. Проекты Разрабатываю веб-приложения от проектирования базы данных до деплоя:E-commerce платформа: Fullstack-магазин с корзиной и авторизацией. REST API для блога: Защищенное серверное приложение с JWT. Интерактивная панель: SPA-приложение для визуализации графиков. Развитие навыков Улучшаю навыки проектирования систем и командной работы: Развертывание приложений (Docker). Проектирование RESTful API. Оптимизация запросов к БД. Асинхронное программирование.
+            </h1>
+        </div>
+
+    </div>
+
+</body>
+</html>
